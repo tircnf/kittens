@@ -103,9 +103,11 @@ environments {
 log4j = {
     // Example of changing the log pattern for the default console appender:
     //
-    //appenders {
-    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-    //}
+    appenders {
+        //console name:'stdout', layout:pattern(conversionPattern: '%d{yyyy-MM-dd HH:mm:ss,SSS Z} [%t] %-5p %C%n%c:%L %x - %m%n')
+        //  get rid of the %l in production.. filename/line number is expensive.
+        console name:'stdout', layout:pattern(conversionPattern: '%l:%c%n%d{yyyy-MM-dd HH:mm:ss,SSS Z} [%t] %-5p %c{2} %x - %m%n %n')
+    }
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -118,4 +120,17 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
+
+      // turn up logging for bootstrap, and anything else under conf
+      debug 'grails.app.conf'
+      // see all ddl statements.
+      debug 'org.hibernate.tool.hbm2ddl'
+
+        /*
+        // some agressive sql logging
+      debug 'org.hibernate.SQL'
+      trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+      info  'org.hibernate.pretty.Printer'
+      */
 }

@@ -4,6 +4,7 @@ dataSource {
     driverClassName = "org.h2.Driver"
     username = "sa"
     password = ""
+    //loggingSql=true
 }
 hibernate {
     cache.use_second_level_cache = true
@@ -11,6 +12,10 @@ hibernate {
     cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
 //    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory' // Hibernate 4
     singleSession = true // configure OSIV singleSession mode
+
+
+    format_sql=true
+    use_sql_comments=true
 }
 
 // environment specific settings
@@ -18,6 +23,8 @@ environments {
     development {
         dataSource {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+                                     // careful with this setting.  in dev mode, if you edit a domain object
+                                     // then all your existing data is dropped and you have to run bootstrap again manually
             url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
