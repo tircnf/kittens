@@ -6,4 +6,8 @@ class Breed {
     }
 
     String description
+
+    String toString() {
+        return description
+    }
 }

@@ -9,4 +9,8 @@ class Kitten {
 
     String name
     Breed breed
+
+    String toString() {
+        return "name: $name     breed: $breed"
+    }
 }
