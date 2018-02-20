@@ -4,6 +4,8 @@ class KittenController {
 
     static responseFormats=['json','xml']
 
+    def sessionFactory
+
     // search command, sorting and filtering properties.
     //kittenName
     //personName
@@ -11,13 +13,17 @@ class KittenController {
     //breed
 
 
-    def test1="max=10&offset=100"
-    def test2="max=10&offset=100&kittenName=2"
-
-    def theTest=test1
-
-
     def index() {
+        def tests=[]
+
+        tests << "max=10&offset=5"
+        tests << "max=10&offset=5&kittenName=2"
+        tests << "max=10&offset=5&kittenName=2&breed=3"
+        tests << "max=10&offset=5&kittenName=2&breed=3&personName=1"
+        tests << "max=10&offset=5&kittenName=2&breed=3&personName=1&sort=name"
+        tests << "max=10&offset=5&kittenName=2&breed=3&personName=1&sort=name,personName"
+
+
 
         def searches=[
             ["A basic where query",  "where"],
@@ -39,8 +45,10 @@ class KittenController {
                     searches.each { searchInfo->
                         hr("")
                         p("${searchInfo[0]}")
-                        a(href:"./${searchInfo[1]}.xml?max=10&offset=100") {
-                            pre("curl http://localhost:8080/kittens/kitten/${searchInfo[1]}?$theTest")
+                        tests.each {t->
+                            a(href:"./${searchInfo[1]}.xml?$t") {
+                                pre("curl http://localhost:8080/kittens/kitten/${searchInfo[1]}?$t")
+                            }
                         }
                     }
                 }
@@ -51,18 +59,62 @@ class KittenController {
 
     def where(KittenSearchCommand ks) {
 
+        sessionFactory.settings.sqlStatementLogger.logToStdout=true
+
+        try {
+
         log.info("using where query  ${ks.properties}")
 
         def pagedResult=Kitten.where {
+            if (ks.kittenName) {
+                name =~ "%${ks.kittenName}%"
+            }
+
+            person {
+                if (ks.personName) {
+                    name =~ "%${ks.personName}%"
+                }
+
+                building {
+                    if (ks.buildingZip) {
+                        zipCode =~ "%${ks.buildingZip}%"
+                    }
+                }
+            }
+
+            breed {
+                if (ks.breed) {
+                    description =~ "%${ks.breed}%"
+                }
+            }
+
+            ks.sortList.each {sort ->
+                if ("personName".equals(sort)) {
+                    // adding this causes an extra query to run...
+                    //  a count of patients.. no idea why.
+                    //  and the order by doesn't work.
+                    //
+                    //person {
+                    //    order("whatisthisthing")
+                    //}
+                } else {
+                    order(sort)
+                }
+            }
 
         }.list(max: ks.max, offset: ks.offset)
 
 
         def result=pagedResult.collect {
-            [id: it.id, name: it.name, breed_id: it.breed.id, breed: it.breed.description, person: it.person.name, building: it.person.building.zipCode]
+            [id: it.id, name: it.name, breed: it.breed.description, person: it.person.name, building: it.person.building.zipCode]
         }
 
         respond ([total: pagedResult.getTotalCount(), data: result])
+
+        } finally {
+            sessionFactory.settings.sqlStatementLogger.logToStdout=false
+
+        }
     }
 
     def finder(KittenSearchCommand ks) {
