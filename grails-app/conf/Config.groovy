@@ -124,6 +124,12 @@ log4j = {
 
       // turn up logging for bootstrap, and anything else under conf
       debug 'grails.app.conf'
+
+      // and, anything under kittens:
+      debug 'grails.app.controllers.kittens'
+
+
+
       // see all ddl statements.
       debug 'org.hibernate.tool.hbm2ddl'
 
