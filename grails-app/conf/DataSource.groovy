@@ -26,6 +26,7 @@ environments {
                                      // careful with this setting.  in dev mode, if you edit a domain object
                                      // then all your existing data is dropped and you have to run bootstrap again manually
             url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            //url = "jdbc:h2:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {

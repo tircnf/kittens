@@ -5,9 +5,9 @@ class BootStrap {
     def init = { servletContext ->
 
 
-        def breedCount=10
-        def buildingCount=10
-        def personBuildingCount=10
+        def breedCount=75
+        def buildingCount=250
+        def personBuildingCount=20
         def kittenPerPerson=5
 
         def counter=0;
@@ -18,7 +18,7 @@ class BootStrap {
         def breeds=[]
 
         if (Breed.count()==0) {
-            10.times {
+            breedCount.times {
                 breeds << new Breed(description: "Breed $it").save(failOnError:true, flush:true)
             }
         } else {
@@ -41,7 +41,14 @@ class BootStrap {
             }
 
             b.save(flush:true, failOnError:true);
+            if (bc%20==0) {
+                log.info("building $bc done.")
+            }
+
+            b.discard()
         }
+
+        log.info("Done... transaction has to finish.")
 
 
 
